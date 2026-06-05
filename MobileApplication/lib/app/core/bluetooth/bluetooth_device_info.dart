@@ -1,7 +1,7 @@
-// 文件作用：定义蓝牙设备在 UI 中展示所需的数据结构。
+// 文件作用：定义底层蓝牙扫描返回的设备信息和扫描结果数据结构。
 
-class BluetoothUiDevice {
-  const BluetoothUiDevice({
+class BluetoothDeviceInfo {
+  const BluetoothDeviceInfo({
     required this.name,
     required this.address,
     required this.signal,
@@ -20,6 +20,6 @@ class BluetoothDiscoveryResult {
     required this.message,
   });
 
-  final List<BluetoothUiDevice> devices;
+  final List<BluetoothDeviceInfo> devices;
   final String message;
 }

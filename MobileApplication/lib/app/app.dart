@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'core/theme/app_theme.dart';
-import 'features/bluetooth/models/bluetooth_ui_device.dart';
+import 'shared/theme/app_theme.dart';
+import 'core/bluetooth/bluetooth_device_info.dart';
 import 'features/bluetooth/models/companion_connect_state.dart';
 import 'features/bluetooth/pages/robot_bluetooth_page.dart';
 import 'features/bot_control/models/companion_move_command.dart';
@@ -139,7 +139,7 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
     });
   }
 
-  void _deviceConnected(BluetoothUiDevice device) {
+  void _deviceConnected(BluetoothDeviceInfo device) {
     setState(() {
       _connectState = CompanionConnectState.connected;
       _mood = CompanionBotMood.happy;
