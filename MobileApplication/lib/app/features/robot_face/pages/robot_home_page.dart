@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../shared/theme/app_colors.dart';
 import '../../../features/bluetooth/models/companion_connect_state.dart';
 import '../../../shared/widgets/app_menu_overlay.dart';
 import '../../../shared/widgets/page_title.dart';

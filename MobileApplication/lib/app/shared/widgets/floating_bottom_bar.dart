@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 import '../../router/app_router.dart';
 
 class FloatingBottomBar extends StatelessWidget {
