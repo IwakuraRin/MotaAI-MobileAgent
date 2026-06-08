@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 class AppColors {
   const AppColors._();
 
-  static const Color pageBackground = Color(0xFFF2F2F0);
+  static const Color pageBackground = Color(0xFFF4F7FB);
   static const Color ink = Color(0xFF1F2937);
-  static const Color muted = Color(0xFF9AA3AF);
-  static const Color orange = Color(0xFFE86C4F);
-  static const Color lime = Color(0xFFC8F25A);
-  static const Color aqua = Color(0xFF68D7E8);
-  static const Color coralSoft = Color(0xFFFFEEE9);
-  static const Color aquaSoft = Color(0xFFE9F8FB);
+  static const Color muted = Color(0xFF94A3B8);
+  static const Color orange = Color(0xFFF26A4D);
+  static const Color lime = Color(0xFFBDF35A);
+  static const Color aqua = Color(0xFF54D5E8);
+  static const Color coralSoft = Color(0xFFFFE9E1);
+  static const Color aquaSoft = Color(0xFFE7F8FC);
   static const Color danger = Color(0xFFEF4444);
   static const Color robotDark = Color(0xFF111827);
   static const Color heroBlack = Color(0xFF111111);
   static const Color heroDeepBlack = Color(0xFF050505);
   static const Color robotScreen = Color(0xFF07111F);
   static const Color robotEye = Color(0xFF5AD7FF);
-  static const Color cardSoft = Color(0xFFF8F8F5);
+  static const Color cardSoft = Color(0xFFF7F9FC);
 }

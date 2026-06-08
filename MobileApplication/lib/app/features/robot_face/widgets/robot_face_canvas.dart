@@ -404,8 +404,10 @@ class RobotHeroPreviewPainter extends CustomPainter {
     final faceCenterY = size.height * 0.46;
     final eyeRadius = size.width * 0.075 * breathe;
 
-    _drawWhiteEye(canvas, Offset(centerX - size.width * 0.18, faceCenterY), eyeRadius);
-    _drawWhiteEye(canvas, Offset(centerX + size.width * 0.18, faceCenterY), eyeRadius);
+    _drawWhiteEye(
+        canvas, Offset(centerX - size.width * 0.18, faceCenterY), eyeRadius);
+    _drawWhiteEye(
+        canvas, Offset(centerX + size.width * 0.18, faceCenterY), eyeRadius);
 
     canvas.drawArc(
       Rect.fromLTWH(centerX - size.width * 0.08, faceCenterY + eyeRadius * 0.92,
@@ -430,7 +432,6 @@ class RobotHeroPreviewPainter extends CustomPainter {
           Colors.white.withValues(alpha: 0.72));
     }
   }
-
 
   @override
   bool shouldRepaint(covariant RobotHeroPreviewPainter oldDelegate) {
@@ -491,7 +492,6 @@ class ImmersiveRobotDisplayPainter extends CustomPainter {
     return oldDelegate.mood != mood || oldDelegate.tick != tick;
   }
 }
-
 
 double _easeSin(double value) {
   return (math.sin(value * math.pi * 2 - math.pi / 2) + 1) / 2;
