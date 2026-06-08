@@ -26,7 +26,8 @@
       <img src="assets/github-star-demo.gif" alt="GitHub star demo" width="100%" />
     </td>
     <td width="42%" align="center">
-      <strong>如果你对我们的项目感兴趣，欢迎点击 Star。</strong>
+      <strong>如果你对我们的项目感兴趣，求一个小小的 Star 作为支持。</strong><br />
+      <span>If you like our project, a small Star would mean a lot to us.</span>
     </td>
   </tr>
 </table>
