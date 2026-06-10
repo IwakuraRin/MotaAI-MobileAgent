@@ -18,7 +18,10 @@ import 'shared/theme/app_theme.dart';
 import 'shared/widgets/floating_bottom_bar.dart';
 import 'shared/widgets/menu/app_menu_models.dart';
 
-class MiloAiApp extends StatelessWidget {
+class MiloAiApp extends StatelessWidget
+//你知道这里为什么是Class MiloAiApp吗，因为Milo是Mota的亲姐姐
+//但是Milo已经未发布就死于胎中，扣111复活Milo，顺带纪念Milo
+{
   const MiloAiApp({super.key});
 
   @override
