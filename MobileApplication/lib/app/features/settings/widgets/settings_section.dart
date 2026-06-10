@@ -1,5 +1,3 @@
-// 文件作用：设置页分组容器。
-
 import 'package:flutter/material.dart';
 import 'package:milo_ai/app/shared/theme/app_colors.dart';
 

@@ -1,128 +1,100 @@
-// 文件作用：组装机器人设置页，连接具体设置项与应用级状态。
-
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:milo_ai/app/features/bluetooth/models/companion_connect_state.dart';
 import 'package:milo_ai/app/features/settings/models/robot_settings.dart';
 import 'package:milo_ai/app/features/settings/models/robot_settings_content.dart';
-import 'package:milo_ai/app/features/settings/widgets/connection_hero.dart';
 import 'package:milo_ai/app/features/settings/widgets/settings_header.dart';
 import 'package:milo_ai/app/features/settings/widgets/settings_row.dart';
 import 'package:milo_ai/app/features/settings/widgets/settings_section.dart';
 import 'package:milo_ai/app/features/settings/widgets/settings_switch_row.dart';
 import 'package:milo_ai/app/features/settings/widgets/status_pill.dart';
 import 'package:milo_ai/app/shared/theme/app_colors.dart';
+import 'package:milo_ai/app/shared/widgets/menu/app_menu_models.dart';
+import 'package:milo_ai/app/shared/widgets/menu/privacy_menu_panel.dart';
+import 'package:milo_ai/app/shared/widgets/menu/profile_menu_panel.dart';
 
 class RobotSettingsPage extends StatelessWidget {
   const RobotSettingsPage({
     required this.connectState,
     required this.settings,
+    required this.profile,
     required this.onSettingsChanged,
-    required this.onScanTap,
-    required this.onConnectTap,
-    required this.onDisconnectTap,
+    required this.onProfileChanged,
     super.key,
   });
 
   final CompanionConnectState connectState;
   final RobotSettings settings;
+  final MenuProfileState profile;
   final ValueChanged<RobotSettings> onSettingsChanged;
-  final VoidCallback onScanTap;
-  final VoidCallback onConnectTap;
-  final VoidCallback onDisconnectTap;
+  final ValueChanged<MenuProfileState> onProfileChanged;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 118),
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 144),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
+          constraints: const BoxConstraints(maxWidth: 540),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingsHeader(),
+              SettingsHeader(
+                profile: profile,
+                onAvatarTap: () => _showProfileEditor(context),
+              ),
               const SizedBox(height: 24),
-              ConnectionHero(
-                connectState: connectState,
-                onScanTap: onScanTap,
-                onConnectTap: onConnectTap,
-                onDisconnectTap: onDisconnectTap,
+              _ProfileHero(
+                profile: profile,
+                onAvatarTap: () => _showProfileEditor(context),
               ),
               const SizedBox(height: 18),
               SettingsSection(
-                title: '机器人连接',
+                title: '个人主页',
                 children: [
                   SettingsRow(
-                    icon: Icons.radar_rounded,
-                    title: '扫描附近机器人',
-                    subtitle: '打开蓝牙扫描窗口，选择可连接设备',
+                    icon: Icons.person_rounded,
+                    title: profile.nickname,
+                    subtitle: '点击上方头像可更换相册图片、默认头像和昵称',
                     accentColor: AppColors.aqua,
-                    onTap: onScanTap,
-                  ),
-                  SettingsRow(
-                    icon: Icons.link_rounded,
-                    title: '快速连接 ${RobotSettingsContent.defaultRobotName}',
-                    subtitle: '用于调试默认机器人连接状态',
-                    accentColor: AppColors.lime,
-                    trailing: const StatusPill(text: '连接'),
-                    onTap: onConnectTap,
-                  ),
-                  SettingsRow(
-                    icon: Icons.link_off_rounded,
-                    title: '断开当前连接',
-                    subtitle: '清空连接状态并恢复默认表情',
-                    accentColor: AppColors.danger,
-                    danger: true,
-                    onTap: onDisconnectTap,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               SettingsSection(
-                title: '体验偏好',
+                title: '体验设置',
                 children: [
-                  SettingsSwitchRow(
-                    icon: Icons.bluetooth_audio_rounded,
-                    title: '自动重连',
-                    subtitle: '在当前会话中优先恢复最近机器人',
-                    value: settings.autoReconnect,
-                    onChanged: _setAutoReconnect,
-                  ),
                   SettingsSwitchRow(
                     icon: Icons.vibration_rounded,
                     title: '触感反馈',
-                    subtitle: '记录导航和重要按钮的触感反馈偏好',
+                    subtitle: '点击导航和关键控制时提供轻微震动',
                     value: settings.hapticFeedback,
                     onChanged: _setHapticFeedback,
                   ),
                   SettingsSwitchRow(
                     icon: Icons.auto_awesome_rounded,
                     title: '表情动画',
-                    subtitle: '记录机器人表情过渡动画偏好',
+                    subtitle: '让机器人表情切换更柔和',
                     value: settings.faceAnimation,
                     onChanged: _setFaceAnimation,
+                  ),
+                  SettingsSwitchRow(
+                    icon: Icons.bluetooth_audio_rounded,
+                    title: '记住连接偏好',
+                    subtitle: '后续接入真实蓝牙后优先恢复最近设备',
+                    value: settings.autoReconnect,
+                    onChanged: _setAutoReconnect,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               SettingsSection(
-                title: '应用与隐私',
+                title: '隐私与关于',
                 children: [
-                  SettingsRow(
-                    icon: Icons.photo_library_rounded,
-                    title: '个人头像',
-                    subtitle: '在主页菜单中可从相册更换头像',
-                    accentColor: AppColors.orange,
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _showToast(
-                      context,
-                      '请回到主页，打开右上角菜单更换头像',
-                    ),
-                  ),
                   SettingsRow(
                     icon: Icons.privacy_tip_rounded,
                     title: '隐私政策',
-                    subtitle: '查看蓝牙、相册和本地设置的使用说明',
+                    subtitle: '查看蓝牙、相册和本地资料的使用说明',
                     accentColor: AppColors.ink,
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => _showPrivacyDialog(context),
@@ -130,7 +102,7 @@ class RobotSettingsPage extends StatelessWidget {
                   SettingsRow(
                     icon: Icons.info_outline_rounded,
                     title: '关于 Milo-AI',
-                    subtitle: 'Flutter 版本，当前用于机器人陪伴控制台',
+                    subtitle: '当前状态：${statusText(connectState)}，Flutter 移动端版本',
                     accentColor: AppColors.aqua,
                     trailing: const StatusPill(
                       text: RobotSettingsContent.appVersion,
@@ -141,6 +113,30 @@ class RobotSettingsPage extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showProfileEditor(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          22,
+          4,
+          22,
+          MediaQuery.viewInsetsOf(context).bottom + 28,
+        ),
+        child: _ProfileEditSheet(
+          profile: profile,
+          onProfileChanged: onProfileChanged,
         ),
       ),
     );
@@ -158,32 +154,17 @@ class RobotSettingsPage extends StatelessWidget {
     onSettingsChanged(settings.copyWith(faceAnimation: value));
   }
 
-  void _showToast(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      ),
-    );
-  }
-
   void _showPrivacyDialog(BuildContext context) {
-    showDialog<void>(
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-        title: const Text('隐私政策'),
-        content: const Text(
-          '当前应用仅在本地模拟机器人控制流程。蓝牙扫描用于发现附近设备，相册权限仅用于选择个人头像，触感反馈用于改善操作体验。',
-          style: TextStyle(height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('知道了'),
-          ),
-        ],
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+      ),
+      builder: (context) => const Padding(
+        padding: EdgeInsets.fromLTRB(22, 4, 22, 28),
+        child: PrivacyMenuPanel(),
       ),
     );
   }
@@ -195,7 +176,7 @@ class RobotSettingsPage extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
         title: const Text('关于 Milo-AI'),
         content: const Text(
-          'Milo-AI 是一个机器人陪伴控制台。当前版本已迁移为 Flutter 项目，支持主页表情、蓝牙扫描、移动控制、新手文档和应用菜单。',
+          'Milo-AI 是一个陪伴机器人控制台。当前 Flutter 版本支持机器人主页、蓝牙扫描、状态面板、移动控制、表情切换、头像本地保存和隐私设置。',
           style: TextStyle(height: 1.5),
         ),
         actions: [
@@ -204,6 +185,292 @@ class RobotSettingsPage extends StatelessWidget {
             child: const Text('关闭'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ProfileHero extends StatelessWidget {
+  const _ProfileHero({
+    required this.profile,
+    required this.onAvatarTap,
+  });
+
+  final MenuProfileState profile;
+  final VoidCallback onAvatarTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.ink,
+      borderRadius: BorderRadius.circular(34),
+      elevation: 12,
+      shadowColor: AppColors.ink.withValues(alpha: 0.18),
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(34),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF202B3A), Color(0xFF111827)],
+          ),
+        ),
+        child: Row(
+          children: [
+            _EditableAvatar(profile: profile, size: 78, onTap: onAvatarTap),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                profile.nickname,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 21,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EditableAvatar extends StatelessWidget {
+  const _EditableAvatar({
+    required this.profile,
+    required this.size,
+    required this.onTap,
+  });
+
+  final MenuProfileState profile;
+  final double size;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AvatarPreview(
+              avatarEmoji: profile.avatarEmoji,
+              avatarImageBytes: profile.avatarImageBytes,
+              size: size,
+            ),
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: 25,
+                height: 25,
+                decoration: const BoxDecoration(
+                  color: AppColors.lime,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: AppColors.ink,
+                  size: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileEditSheet extends StatefulWidget {
+  const _ProfileEditSheet({
+    required this.profile,
+    required this.onProfileChanged,
+  });
+
+  final MenuProfileState profile;
+  final ValueChanged<MenuProfileState> onProfileChanged;
+
+  @override
+  State<_ProfileEditSheet> createState() => _ProfileEditSheetState();
+}
+
+class _ProfileEditSheetState extends State<_ProfileEditSheet> {
+  static const List<String> _avatarChoices = [
+    '🤖',
+    '😊',
+    '😎',
+    '🚀',
+    '⭐',
+    '🧠',
+  ];
+
+  late MenuProfileState _profile;
+  late final TextEditingController _nicknameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+    _nicknameController = TextEditingController(text: _profile.nickname);
+  }
+
+  @override
+  void dispose() {
+    _nicknameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickAvatarFromGallery() async {
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 900,
+      maxHeight: 900,
+      imageQuality: 88,
+    );
+    if (image == null) {
+      return;
+    }
+
+    final bytes = await image.readAsBytes();
+    _changeProfile(_profile.copyWith(avatarImageBytes: bytes));
+  }
+
+  void _selectEmojiAvatar(String emoji) {
+    _changeProfile(
+      _profile.copyWith(avatarEmoji: emoji, clearAvatarImage: true),
+    );
+  }
+
+  void _changeProfile(MenuProfileState profile) {
+    setState(() => _profile = profile);
+    widget.onProfileChanged(profile);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '编辑个人主页',
+          style: TextStyle(
+            color: AppColors.ink,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            AvatarPreview(
+              avatarEmoji: _profile.avatarEmoji,
+              avatarImageBytes: _profile.avatarImageBytes,
+              size: 72,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                _profile.nickname,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColors.ink,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            _AvatarChoiceButton(
+              selected: _profile.avatarImageBytes != null,
+              onTap: _pickAvatarFromGallery,
+              child: const Icon(
+                Icons.add_rounded,
+                color: AppColors.ink,
+                size: 30,
+              ),
+            ),
+            ..._avatarChoices.map(
+              (emoji) => _AvatarChoiceButton(
+                selected: _profile.avatarImageBytes == null &&
+                    _profile.avatarEmoji == emoji,
+                onTap: () => _selectEmojiAvatar(emoji),
+                child: Text(emoji, style: const TextStyle(fontSize: 24)),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        TextField(
+          controller: _nicknameController,
+          onChanged: (value) {
+            _changeProfile(_profile.copyWith(nickname: value));
+          },
+          decoration: InputDecoration(
+            labelText: '昵称',
+            filled: true,
+            fillColor: AppColors.cardSoft,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AvatarChoiceButton extends StatelessWidget {
+  const _AvatarChoiceButton({
+    required this.selected,
+    required this.onTap,
+    required this.child,
+  });
+
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      decoration: BoxDecoration(
+        color: selected ? AppColors.lime : AppColors.cardSoft,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: AppColors.lime.withValues(alpha: 0.28),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(width: 58, height: 58, child: Center(child: child)),
       ),
     );
   }

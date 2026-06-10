@@ -1,10 +1,17 @@
-// 文件作用：设置页顶部标题区。
-
 import 'package:flutter/material.dart';
 import 'package:milo_ai/app/shared/theme/app_colors.dart';
+import 'package:milo_ai/app/shared/widgets/menu/app_menu_models.dart';
+import 'package:milo_ai/app/shared/widgets/menu/profile_menu_panel.dart';
 
 class SettingsHeader extends StatelessWidget {
-  const SettingsHeader({super.key});
+  const SettingsHeader({
+    required this.profile,
+    required this.onAvatarTap,
+    super.key,
+  });
+
+  final MenuProfileState profile;
+  final VoidCallback onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +32,7 @@ class SettingsHeader extends StatelessWidget {
               ),
               SizedBox(height: 2),
               Text(
-                '连接、体验与隐私设置',
+                '个人主页、体验与隐私设置',
                 style: TextStyle(
                   color: AppColors.muted,
                   fontSize: 15,
@@ -35,22 +42,24 @@ class SettingsHeader extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
+        Material(
+          color: Colors.white,
+          shape: const CircleBorder(),
+          elevation: 8,
+          shadowColor: Colors.black.withValues(alpha: 0.08),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onAvatarTap,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: AvatarPreview(
+                avatarEmoji: profile.avatarEmoji,
+                avatarImageBytes: profile.avatarImageBytes,
+                size: 54,
               ),
-            ],
+            ),
           ),
-          alignment: Alignment.center,
-          child: const Text('🤖', style: TextStyle(fontSize: 24)),
         ),
       ],
     );

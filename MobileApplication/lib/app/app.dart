@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/BT_HardwareDrive/bluetooth_device_info.dart';
 import 'features/bluetooth/models/companion_connect_state.dart';
 import 'features/bluetooth/pages/robot_bluetooth_page.dart';
 import 'features/bot_control/models/companion_move_command.dart';
 import 'features/bot_control/pages/robot_control_page.dart';
-import 'features/guide/pages/robot_beginner_guide_page.dart';
 import 'features/robot_face/models/companion_bot_mood.dart';
 import 'features/robot_face/pages/immersive_robot_page.dart';
 import 'features/robot_face/pages/robot_home_page.dart';
@@ -13,8 +15,8 @@ import 'features/settings/models/robot_settings.dart';
 import 'features/settings/pages/robot_settings_page.dart';
 import 'router/app_router.dart';
 import 'shared/theme/app_theme.dart';
-import 'shared/widgets/app_menu_overlay.dart';
 import 'shared/widgets/floating_bottom_bar.dart';
+import 'shared/widgets/menu/app_menu_models.dart';
 
 class MiloAiApp extends StatelessWidget
 //你知道这里为什么是Class MiloAiApp吗，因为Milo是Mota的亲姐姐
@@ -41,15 +43,28 @@ class CompanionRobotApp extends StatefulWidget {
 }
 
 class _CompanionRobotAppState extends State<CompanionRobotApp> {
+  static const String _nicknameKey = 'menu_profile_nickname';
+  static const String _avatarEmojiKey = 'menu_profile_avatar_emoji';
+  static const String _avatarImageKey = 'menu_profile_avatar_image';
+
   CompanionBotMood _mood = CompanionBotMood.neutral;
   CompanionConnectState _connectState = CompanionConnectState.disconnected;
   RobotSettings _settings = const RobotSettings();
+  MenuProfileState _profile = const MenuProfileState(
+    nickname: 'Lin Robot 用户',
+    avatarEmoji: '🤖',
+  );
   RobotTab _currentTab = RobotTab.home;
   String _lastCommand = '暂无指令';
   String _aiMessage = '点击 AI 呼唤，可以模拟让机器人来到你身边。';
   int _bluetoothScanRequest = 0;
   bool _showFullScreenFace = false;
-  bool _showAppMenu = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +87,6 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
                 onTabChange: (tab) => setState(() => _currentTab = tab),
               ),
             ),
-            AppMenuOverlay(
-              visible: _showAppMenu,
-              onDismiss: () => setState(() => _showAppMenu = false),
-            ),
           ],
         ),
       ),
@@ -94,11 +105,16 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
           onAiCallTap: _aiCall,
           onScanTap: _openBluetoothScanner,
           onConnectTap: _quickConnect,
-          onMenuTap: () => setState(() => _showAppMenu = true),
         ),
       RobotTab.move => RobotControlPage(
           connectState: _connectState,
+          mood: _mood,
           lastCommand: _lastCommand,
+          aiMessage: _aiMessage,
+          onMoodChange: (mood) => setState(() => _mood = mood),
+          onScanTap: _openBluetoothScanner,
+          onConnectTap: _quickConnect,
+          onDisconnectTap: _disconnect,
           onMoveCommand: _moveRobot,
         ),
       RobotTab.bluetooth => RobotBluetoothPage(
@@ -108,16 +124,51 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
           onDeviceConnected: _deviceConnected,
           onDisconnectTap: _disconnect,
         ),
-      RobotTab.guide => const RobotBeginnerGuidePage(),
       RobotTab.settings => RobotSettingsPage(
           connectState: _connectState,
           settings: _settings,
+          profile: _profile,
           onSettingsChanged: _settingsChanged,
-          onScanTap: _openBluetoothScanner,
-          onConnectTap: _quickConnect,
-          onDisconnectTap: _disconnect,
+          onProfileChanged: _profileChanged,
         ),
     };
+  }
+
+  Future<void> _loadProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final image = prefs.getString(_avatarImageKey);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _profile = MenuProfileState(
+        nickname: prefs.getString(_nicknameKey) ?? _profile.nickname,
+        avatarEmoji: prefs.getString(_avatarEmojiKey) ?? _profile.avatarEmoji,
+        avatarImageBytes: image == null ? null : base64Decode(image),
+      );
+    });
+  }
+
+  Future<void> _profileChanged(MenuProfileState profile) async {
+    setState(() => _profile = profile);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_nicknameKey, profile.nickname);
+    await prefs.setString(_avatarEmojiKey, profile.avatarEmoji);
+
+    final imageBytes = profile.avatarImageBytes;
+    if (imageBytes == null) {
+      await prefs.remove(_avatarImageKey);
+      return;
+    }
+
+    await prefs.setString(_avatarImageKey, base64Encode(imageBytes));
+  }
+
+  void _settingsChanged(RobotSettings settings) {
+    setState(() => _settings = settings);
   }
 
   void _openBluetoothScanner() {
@@ -125,10 +176,6 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
       _currentTab = RobotTab.bluetooth;
       _bluetoothScanRequest += 1;
     });
-  }
-
-  void _settingsChanged(RobotSettings settings) {
-    setState(() => _settings = settings);
   }
 
   void _scanStarted() {

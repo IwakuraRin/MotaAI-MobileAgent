@@ -1,5 +1,3 @@
-// 文件作用：设置页里的短状态标签。
-
 import 'package:flutter/material.dart';
 import 'package:milo_ai/app/shared/theme/app_colors.dart';
 
@@ -11,7 +9,7 @@ class StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.cardSoft,
         borderRadius: BorderRadius.circular(999),
@@ -19,7 +17,7 @@ class StatusPill extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: AppColors.ink,
+          color: AppColors.orange,
           fontSize: 12,
           fontWeight: FontWeight.w900,
         ),
