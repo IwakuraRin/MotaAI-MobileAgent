@@ -45,16 +45,15 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
   static const String _profileBioKey = 'menu_profile_bio';
   static const String _profileTagsKey = 'menu_profile_tags';
 
-  CompanionBotMood _mood = CompanionBotMood.neutral;
-  CompanionConnectState _connectState = CompanionConnectState.disconnected;
+  final CompanionBotMood _mood = CompanionBotMood.neutral;
+  final CompanionConnectState _connectState =
+      CompanionConnectState.disconnected;
   RobotSettings _settings = const RobotSettings();
   MenuProfileState _profile = const MenuProfileState(
     nickname: 'Lin Robot 用户',
     avatarEmoji: '🤖',
   );
   RobotTab _currentTab = RobotTab.home;
-  String _lastCommand = '暂无指令';
-  String _aiMessage = '当前等待机器人状态更新。';
   bool _showFullScreenFace = false;
 
   @override
@@ -94,12 +93,7 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
     return switch (_currentTab) {
       RobotTab.home => RobotHomePage(
           mood: _mood,
-          connectState: _connectState,
-          lastCommand: _lastCommand,
-          aiMessage: _aiMessage,
-          onMoodChange: (mood) => setState(() => _mood = mood),
           onFullScreenTap: () => setState(() => _showFullScreenFace = true),
-          onConnectTap: _quickConnect,
         ),
       RobotTab.settings => RobotSettingsPage(
           connectState: _connectState,
@@ -151,14 +145,5 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
 
   void _settingsChanged(RobotSettings settings) {
     setState(() => _settings = settings);
-  }
-
-  void _quickConnect() {
-    setState(() {
-      _connectState = CompanionConnectState.connected;
-      _mood = CompanionBotMood.happy;
-      _lastCommand = '已连接 LinBot-01';
-      _aiMessage = '连接成功，当前是前端模拟连接。';
-    });
   }
 }
