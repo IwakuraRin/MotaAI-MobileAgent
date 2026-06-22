@@ -68,16 +68,6 @@ class RobotHeroPreviewPainter extends CustomPainter {
         eyeRadius, blink);
     _drawBlinkingEye(canvas, Offset(centerX + size.width * 0.18, faceCenterY),
         eyeRadius, blink);
-
-    for (var index = 0; index < 4; index++) {
-      final barHeight = 7.0 + index * 4.5;
-      _roundRect(
-          canvas,
-          Rect.fromLTWH(size.width - 58 + index * 8,
-              faceCenterY - eyeRadius * 0.9 - barHeight, 5, barHeight),
-          3,
-          Colors.white.withValues(alpha: 0.72));
-    }
   }
 
   @override
@@ -108,9 +98,4 @@ void _drawBlinkingEye(
     height: math.max(radius * 0.16, radius * 2 * heightScale),
   );
   canvas.drawOval(eyeRect, Paint()..color = Colors.white);
-}
-
-void _roundRect(Canvas canvas, Rect rect, double radius, Color color) {
-  canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)),
-      Paint()..color = color);
 }

@@ -17,7 +17,7 @@ void main() {
     expect(find.text('你想和Mota聊些什么？'), findsOneWidget);
     expect(find.text('输入你想说的话'), findsOneWidget);
     expect(find.text('对话'), findsOneWidget);
-    expect(find.text('插件社区'), findsOneWidget);
+    expect(find.text('创意工坊'), findsOneWidget);
     expect(find.text('设置'), findsOneWidget);
     expect(find.text('Move'), findsNothing);
     expect(find.text('BT'), findsNothing);
