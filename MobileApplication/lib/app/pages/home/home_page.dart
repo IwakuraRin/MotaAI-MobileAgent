@@ -29,37 +29,32 @@ class RobotHomePage extends StatelessWidget {
 
             return ColoredBox(
               color: AppColors.heroDeepBlack,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 124),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - 124,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: topGap),
-                      SizedBox(
-                        height: faceHeight,
-                        child: FractionallySizedBox(
-                          widthFactor: 0.78,
-                          child: RobotHeroPreview(mood: mood),
-                        ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 96),
+                child: Column(
+                  children: [
+                    SizedBox(height: topGap),
+                    SizedBox(
+                      height: faceHeight,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.78,
+                        child: RobotHeroPreview(mood: mood),
                       ),
-                      const SizedBox(height: 30),
-                      const Text(
-                        '你想和Mota聊些什么？',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 23,
-                          fontWeight: FontWeight.w800,
-                          height: 1.2,
-                        ),
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      '你想和Mota聊些什么？',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
-                      const SizedBox(height: 22),
-                      const _MotaChatInput(),
-                    ],
-                  ),
+                    ),
+                    const Spacer(),
+                    const _MotaChatInput(),
+                  ],
                 ),
               ),
             );

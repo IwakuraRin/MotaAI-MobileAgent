@@ -1,4 +1,4 @@
-// 文件作用：复刻原 Kotlin 项目的底部浮动白色圆角导航栏，集中处理导航入口和触感反馈。
+// 文件作用：集中处理底部横向导航栏入口和触感反馈。
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,30 +18,31 @@ class FloatingBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-        child: Material(
-          color: Colors.white.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(30),
-          elevation: 18,
-          shadowColor: Colors.black.withValues(alpha: 0.18),
-          child: SizedBox(
-            height: 74,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: RobotTab.values.map((tab) {
-                return BottomTabItem(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: AppColors.muted.withValues(alpha: 0.18)),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          height: 72,
+          child: Row(
+            children: RobotTab.values.map((tab) {
+              return Expanded(
+                child: BottomTabItem(
                   tab: tab,
                   selected: tab == currentTab,
                   onTap: () {
                     HapticFeedback.selectionClick();
                     onTabChange(tab);
                   },
-                );
-              }).toList(),
-            ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ),
@@ -65,18 +66,25 @@ class BottomTabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: SizedBox.expand(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(tab.icon, style: const TextStyle(fontSize: 20)),
+              Image.asset(
+                tab.iconAsset,
+                width: 24,
+                height: 24,
+                color: selected ? AppColors.orange : AppColors.muted,
+                colorBlendMode: BlendMode.srcIn,
+                filterQuality: FilterQuality.high,
+              ),
+              const SizedBox(height: 3),
               Text(
                 tab.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: selected ? AppColors.orange : AppColors.muted,
                   fontSize: 11,

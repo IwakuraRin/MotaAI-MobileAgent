@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'shared/models/companion_connect_state.dart';
 import 'pages/home/models/companion_bot_mood.dart';
 import 'pages/home/home_page.dart';
-import 'pages/plugin_community/plugin_community_page.dart';
+import 'pages/creative_workshop/creative_workshop_page.dart';
 import 'pages/set/models/robot_settings.dart';
 import 'pages/set/set_page.dart';
 import 'router/app_router.dart';
@@ -86,7 +86,7 @@ class _CompanionRobotAppState extends State<CompanionRobotApp> {
       RobotTab.chat => RobotHomePage(
           mood: _mood,
         ),
-      RobotTab.pluginCommunity => const PluginCommunityPage(),
+      RobotTab.creativeWorkshop => const CreativeWorkshopPage(),
       RobotTab.settings => RobotSettingsPage(
           connectState: _connectState,
           settings: _settings,

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../shared/theme/app_colors.dart';
 
-class PluginCommunityPage extends StatelessWidget {
-  const PluginCommunityPage({super.key});
+class CreativeWorkshopPage extends StatelessWidget {
+  const CreativeWorkshopPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
       color: AppColors.pageBackground,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(22, 22, 22, 124),
+        padding: const EdgeInsets.fromLTRB(22, 22, 22, 96),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 540),
@@ -18,7 +18,7 @@ class PluginCommunityPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '插件社区',
+                  '创意工坊',
                   style: TextStyle(
                     color: AppColors.ink,
                     fontSize: 28,
