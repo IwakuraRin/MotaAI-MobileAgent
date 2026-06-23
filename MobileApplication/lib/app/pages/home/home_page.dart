@@ -41,13 +41,15 @@ class _RobotHomePageState extends State<RobotHomePage> {
 
         return LayoutBuilder(
           builder: (context, constraints) {
-            final topGap =
-                (constraints.maxHeight * 0.18).clamp(96.0, 148.0).toDouble();
-            final faceHeight =
-                (constraints.maxHeight * 0.22).clamp(160.0, 210.0).toDouble();
+            final topGap = (constraints.maxHeight * 0.18)
+                .clamp(96.0, 148.0)
+                .toDouble();
+            final faceHeight = (constraints.maxHeight * 0.22)
+                .clamp(160.0, 210.0)
+                .toDouble();
 
             return ColoredBox(
-              color: Colors.white,
+              color: AppColors.chatWarmBackground,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 0, 24, 96),
                 child: Column(
@@ -94,7 +96,7 @@ class _PortraitOnlyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ColoredBox(
-      color: Colors.white,
+      color: AppColors.chatWarmBackground,
       child: Center(
         child: Padding(
           padding: EdgeInsets.all(28),

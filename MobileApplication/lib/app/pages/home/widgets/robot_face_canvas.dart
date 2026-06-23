@@ -4,13 +4,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../shared/theme/app_colors.dart';
 import '../models/companion_bot_mood.dart';
 
 class RobotHeroPreview extends StatefulWidget {
-  const RobotHeroPreview({
-    required this.mood,
-    super.key,
-  });
+  const RobotHeroPreview({required this.mood, super.key});
 
   final CompanionBotMood mood;
 
@@ -26,8 +24,9 @@ class _RobotHeroPreviewState extends State<RobotHeroPreview>
   void initState() {
     super.initState();
     _loop = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3000))
-      ..repeat();
+      vsync: this,
+      duration: const Duration(milliseconds: 3000),
+    )..repeat();
   }
 
   @override
@@ -42,8 +41,10 @@ class _RobotHeroPreviewState extends State<RobotHeroPreview>
       animation: _loop,
       builder: (context, child) {
         return CustomPaint(
-          painter:
-              RobotHeroPreviewPainter(mood: widget.mood, tick: _loop.value),
+          painter: RobotHeroPreviewPainter(
+            mood: widget.mood,
+            tick: _loop.value,
+          ),
         );
       },
     );
@@ -64,10 +65,18 @@ class RobotHeroPreviewPainter extends CustomPainter {
     final eyeRadius = size.width * 0.105 * breathe;
 
     final blink = _blinkAmount(tick);
-    _drawBlinkingEye(canvas, Offset(centerX - size.width * 0.22, faceCenterY),
-        eyeRadius, blink);
-    _drawBlinkingEye(canvas, Offset(centerX + size.width * 0.22, faceCenterY),
-        eyeRadius, blink);
+    _drawBlinkingEye(
+      canvas,
+      Offset(centerX - size.width * 0.22, faceCenterY),
+      eyeRadius,
+      blink,
+    );
+    _drawBlinkingEye(
+      canvas,
+      Offset(centerX + size.width * 0.22, faceCenterY),
+      eyeRadius,
+      blink,
+    );
   }
 
   @override
@@ -90,12 +99,16 @@ double _blinkAmount(double tick) {
 }
 
 void _drawBlinkingEye(
-    Canvas canvas, Offset center, double radius, double blinkAmount) {
+  Canvas canvas,
+  Offset center,
+  double radius,
+  double blinkAmount,
+) {
   final heightScale = 1 - blinkAmount * 0.9;
   final eyeRect = Rect.fromCenter(
     center: center,
     width: radius * 2,
     height: math.max(radius * 0.16, radius * 2 * heightScale),
   );
-  canvas.drawOval(eyeRect, Paint()..color = Colors.black);
+  canvas.drawOval(eyeRect, Paint()..color = AppColors.robotEyeSoftDark);
 }
