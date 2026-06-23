@@ -48,26 +48,30 @@ static const struct ble_gatt_svc_def ble_services[] = {
             {
                 .uuid = &mota_uart_rx_uuid.u,
                 .access_cb = ble_gatt_access,
-                .flags = BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_WRITE_NO_RSP,
+                .flags = BLE_GATT_CHR_F_WRITE |
+                         BLE_GATT_CHR_F_WRITE_NO_RSP |
+                         BLE_GATT_CHR_F_WRITE_ENC,
             },
             /* 设备发给手机的 TX characteristic，通过 notify 输出。 */
             {
                 .uuid = &mota_uart_tx_uuid.u,
                 .access_cb = ble_gatt_access,
-                .flags = BLE_GATT_CHR_F_NOTIFY,
+                .flags = BLE_GATT_CHR_F_NOTIFY |
+                         BLE_GATT_CHR_F_NOTIFY_INDICATE_ENC,
                 .val_handle = &ble_stream_tx_value_handle,
             },
             /* 预留配置 characteristic，用于后续修改广播名等设置。 */
             {
                 .uuid = &mota_config_uuid.u,
                 .access_cb = ble_gatt_access,
-                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_WRITE,
+                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_READ_ENC |
+                         BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_WRITE_ENC,
             },
             /* 预留设备信息 characteristic，用于后续读取设备标识。 */
             {
                 .uuid = &mota_device_info_uuid.u,
                 .access_cb = ble_gatt_access,
-                .flags = BLE_GATT_CHR_F_READ,
+                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_READ_ENC,
             },
             { 0 },
         },

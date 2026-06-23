@@ -1,5 +1,11 @@
 CONFIG_IDF_TARGET="esp32s3"
 
+# Current diagnostic build: keep DEBUG logs enabled.
+CONFIG_LOG_DEFAULT_LEVEL_DEBUG=y
+CONFIG_LOG_DEFAULT_LEVEL=4
+CONFIG_LOG_MAXIMUM_LEVEL_DEBUG=y
+CONFIG_LOG_MAXIMUM_LEVEL=4
+
 # ESP32-S3N16R8: 16 MB flash.
 CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 CONFIG_ESPTOOLPY_FLASHSIZE="16MB"
@@ -19,7 +25,7 @@ CONFIG_BT_CONTROLLER_ENABLED=y
 # Keep only the roles needed by this firmware:
 # - Peripheral/Broadcaster: phone discovers and connects to Mota.
 # - GATT Server: BLE UART-style command channel.
-# - Security: reserved for future pairing/bonding flows.
+# - Security: unified pairing/bonding for all central connections.
 # CONFIG_BT_NIMBLE_ROLE_CENTRAL is not set
 CONFIG_BT_NIMBLE_ROLE_PERIPHERAL=y
 CONFIG_BT_NIMBLE_ROLE_BROADCASTER=y

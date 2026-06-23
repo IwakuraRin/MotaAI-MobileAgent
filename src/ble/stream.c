@@ -6,9 +6,12 @@
 #include <string.h>
 
 #include "esp_err.h"
+#include "esp_log.h"
 #include "host/ble_hs.h"
 
 #define BLE_STREAM_RX_BUFFER_SIZE 1024  ///< RX JSON 行缓冲区容量，单位字节。
+
+static const char *TAG = "ble_stream";  ///< 本模块日志标签。
 
 uint16_t ble_stream_tx_value_handle;  ///< TX characteristic value handle，由 GATT 注册时写入。
 static uint16_t conn_handle = BLE_HS_CONN_HANDLE_NONE;  ///< 当前连接 handle，未连接时为 BLE_HS_CONN_HANDLE_NONE。
@@ -24,6 +27,7 @@ static void ble_stream_reset_link(void)
     conn_handle = BLE_HS_CONN_HANDLE_NONE;
     mtu = BLE_ATT_MTU_DFLT;
     tx_subscribed = false;
+    rx_buffer_len = 0;
 }
 
 void ble_stream_on_gap_event(const struct ble_gap_event *event)
@@ -32,23 +36,42 @@ void ble_stream_on_gap_event(const struct ble_gap_event *event)
     case BLE_GAP_EVENT_CONNECT:
         if (event->connect.status == 0) {
             conn_handle = event->connect.conn_handle;
+            mtu = BLE_ATT_MTU_DFLT;
+            tx_subscribed = false;
+            ESP_LOGD(TAG, "link opened: handle=%u", conn_handle);
         } else {
+            ESP_LOGW(TAG, "connect failed, reset stream state: %d",
+                     event->connect.status);
             ble_stream_reset_link();
         }
         break;
 
     case BLE_GAP_EVENT_DISCONNECT:
+        ESP_LOGD(TAG, "link closed: handle=%u subscribed=%u rx_len=%u",
+                 conn_handle, tx_subscribed, (unsigned)rx_buffer_len);
         ble_stream_reset_link();
         break;
 
     case BLE_GAP_EVENT_SUBSCRIBE:
         if (event->subscribe.attr_handle == ble_stream_tx_value_handle) {
             tx_subscribed = event->subscribe.cur_notify;
+            ESP_LOGD(TAG,
+                     "tx subscribe: conn=%u attr=%u reason=%u prev_notify=%u cur_notify=%u prev_indicate=%u cur_indicate=%u",
+                     event->subscribe.conn_handle,
+                     event->subscribe.attr_handle,
+                     event->subscribe.reason,
+                     event->subscribe.prev_notify,
+                     event->subscribe.cur_notify,
+                     event->subscribe.prev_indicate,
+                     event->subscribe.cur_indicate);
         }
         break;
 
     case BLE_GAP_EVENT_MTU:
         mtu = event->mtu.value;
+        ESP_LOGD(TAG, "mtu updated: conn=%u channel=%u mtu=%u",
+                 event->mtu.conn_handle, event->mtu.channel_id,
+                 event->mtu.value);
         break;
 
     default:
@@ -60,6 +83,7 @@ void ble_stream_on_gap_event(const struct ble_gap_event *event)
 static int ble_stream_emit_rx_json(void)
 {
     if (rx_callback != NULL && rx_buffer_len > 0) {
+        ESP_LOGD(TAG, "rx json line: len=%u", (unsigned)rx_buffer_len);
         rx_callback(rx_buffer, rx_buffer_len);
     }
 
@@ -71,14 +95,19 @@ int ble_stream_rx_write(struct os_mbuf *om)
 {
     uint16_t len = OS_MBUF_PKTLEN(om);             ///< 本次写入 mbuf 的总字节数。
     uint8_t chunk[BLE_STREAM_RX_BUFFER_SIZE];      ///< 扁平化后的本次写入数据。
-    int rc;                                       ///< NimBLE mbuf 转换返回码。
+    int rc;                                        ///< NimBLE mbuf 转换返回码。
 
+    ESP_LOGD(TAG, "rx write: len=%u buffered=%u", len,
+             (unsigned)rx_buffer_len);
     if (len > sizeof(chunk)) {
+        ESP_LOGW(TAG, "rx write too large: len=%u max=%u", len,
+                 (unsigned)sizeof(chunk));
         return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
     }
 
     rc = ble_hs_mbuf_to_flat(om, chunk, sizeof(chunk), &len);
     if (rc != 0) {
+        ESP_LOGW(TAG, "rx flatten failed: %d", rc);
         return BLE_ATT_ERR_UNLIKELY;
     }
 
@@ -98,6 +127,8 @@ int ble_stream_rx_write(struct os_mbuf *om)
         }
 
         if (rx_buffer_len >= sizeof(rx_buffer)) {
+            ESP_LOGW(TAG, "rx buffer overflow: capacity=%u",
+                     (unsigned)sizeof(rx_buffer));
             rx_buffer_len = 0;
             return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
         }
@@ -120,11 +151,15 @@ static esp_err_t ble_stream_notify_chunk(const uint8_t *data, size_t len)
     int rc;                                                 ///< notification 发送返回码。
 
     if (om == NULL) {
+        ESP_LOGW(TAG, "notify allocation failed: len=%u", (unsigned)len);
         return ESP_ERR_NO_MEM;
     }
 
     rc = ble_gatts_notify_custom(conn_handle, ble_stream_tx_value_handle, om);
     if (rc != 0) {
+        ESP_LOGW(TAG, "notify failed: rc=%d handle=%u attr=%u len=%u",
+                 rc, conn_handle, ble_stream_tx_value_handle,
+                 (unsigned)len);
         return ESP_FAIL;
     }
 
@@ -142,9 +177,12 @@ esp_err_t ble_stream_tx_json(const char *json, size_t len)
     }
 
     if (!ble_stream_tx_ready()) {
+        ESP_LOGD(TAG, "tx not ready: conn=%u subscribed=%u",
+                 conn_handle, tx_subscribed);
         return ESP_ERR_INVALID_STATE;
     }
 
+    ESP_LOGD(TAG, "tx json: len=%u mtu=%u", (unsigned)len, mtu);
     payload_size = mtu > 3 ? (size_t)mtu - 3 : 20;
     while (offset < len) {
         size_t chunk_len = len - offset;  ///< 本次 notification 分片长度。
