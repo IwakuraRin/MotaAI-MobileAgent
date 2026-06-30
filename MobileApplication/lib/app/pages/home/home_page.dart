@@ -48,37 +48,52 @@ class _RobotHomePageState extends State<RobotHomePage> {
 
             return ColoredBox(
               color: AppColors.chatWarmBackground,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                child: Column(
-                  children: [
-                    SizedBox(height: topGap),
-                    SizedBox(
-                      height: faceHeight,
-                      child: FractionallySizedBox(
-                        widthFactor: 0.96,
-                        child: RobotHeroPreview(mood: widget.mood),
-                      ),
+              child: AnimatedBuilder(
+                animation: _chatController,
+                builder: (context, child) {
+                  final hasConversation = _chatController.messages.isNotEmpty ||
+                      _chatController.isSending ||
+                      _chatController.errorText != null;
+
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+                    child: Column(
+                      children: [
+                        if (hasConversation)
+                          const SizedBox(height: 8)
+                        else ...[
+                          SizedBox(height: topGap),
+                          SizedBox(
+                            height: faceHeight,
+                            child: FractionallySizedBox(
+                              widthFactor: 0.96,
+                              child: RobotHeroPreview(mood: widget.mood),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            '你想和Mota聊些什么？',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.ink,
+                              fontSize: 23,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                        Expanded(
+                          child: hasConversation
+                              ? MotaChatTranscript(
+                                  chatController: _chatController,
+                                )
+                              : const SizedBox.expand(),
+                        ),
+                        MotaChatInput(chatController: _chatController),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      '你想和Mota聊些什么？',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.ink,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
-                      ),
-                    ),
-                    Expanded(
-                      child: MotaChatTranscript(
-                        chatController: _chatController,
-                      ),
-                    ),
-                    MotaChatInput(chatController: _chatController),
-                  ],
-                ),
+                  );
+                },
               ),
             );
           },
