@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/pc_bridge/pc_bridge_controller.dart';
 import '../../shared/theme/app_colors.dart';
 import 'controllers/mota_chat_controller.dart';
 import 'models/companion_bot_mood.dart';
@@ -18,15 +19,18 @@ class RobotHomePage extends StatefulWidget {
 
 class _RobotHomePageState extends State<RobotHomePage> {
   late final MotaChatController _chatController;
+  late final PcBridgeController _bridgeController;
 
   @override
   void initState() {
     super.initState();
     _chatController = MotaChatController();
+    _bridgeController = PcBridgeController()..loadSettings();
   }
 
   @override
   void dispose() {
+    _bridgeController.dispose();
     _chatController.dispose();
     super.dispose();
   }
@@ -89,7 +93,10 @@ class _RobotHomePageState extends State<RobotHomePage> {
                                 )
                               : const SizedBox.expand(),
                         ),
-                        MotaChatInput(chatController: _chatController),
+                        MotaChatInput(
+                          chatController: _chatController,
+                          bridgeController: _bridgeController,
+                        ),
                       ],
                     ),
                   );
