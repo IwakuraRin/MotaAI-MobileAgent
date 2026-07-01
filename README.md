@@ -1,12 +1,12 @@
 <p align="center">
-  中文 | <a href="docs/README-ENG.md">English</a>
-</p>
-
-<p align="center">
   <img src="assets/logo-rounded.png" alt="Mota logo" width="160" />
 </p>
 
 <h1 align="center">MotaAI「MobileAgent」</h1>
+
+<p align="center">
+  中文 | <a href="docs/README-ENG.md">English</a>
+</p>
 
 <p align="center">
   <a href="https://github.com/IwakuraRin/MotaAI-MobileAgent">
